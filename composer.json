@@ -1,0 +1,19 @@
+{
+    "name": "quadra-digital/silverstripe-schema",
+    "description": "Provides an interface for adding schema.org based structured data.",
+    "type": "silverstripe-module",
+    "require": {
+        "silverstripe/cms": "^3.2"
+    },
+    "license": "BSD-3-Clause",
+    "authors": [
+        {
+            "name": "Joe Harvey",
+            "email": "joe.harvey@quadradigital.co.uk"
+        }
+    ],
+    "minimum-stability": "stable",
+    "extra": {
+        "installer-name": "silverstripe-schema"
+    }
+}

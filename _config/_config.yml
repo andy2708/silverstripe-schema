@@ -1,0 +1,47 @@
+---
+Name: schema
+After:
+  - 'framework'
+  - 'cms'
+---
+DevelopmentAdmin:
+  registered_controllers:
+      build:
+        controller: 'DevBuildExtension'
+Member:
+  extensions:
+    - SchemaExtension
+SiteConfig:
+  extensions:
+    - SchemaExtension
+SiteTree:
+  extensions:
+    - SchemaExtension
+File:
+  extensions:
+    - SchemaExtension
+SchemaProperty:
+  dynamic_value_default_options:
+    Member:
+      '->getName()'       : 'Members Full Name'
+      '->FirstName'       : 'Members First Name'
+      '->Surname'         : 'Members Surname'
+      '->DOB'             : 'Members DOB'
+      '->Email'           : 'Members E-mail'
+      '->Locale'          : 'Members Language'
+    SiteConfig:
+      '->Title'           : 'Site Name'
+      '->Tagline'         : 'Site Tag Line'
+    SiteTree:
+      '->Link()'          : 'URL'
+      '->getMenuTitle()'  : 'Title'
+      '->Breadcrumbs()'   : 'Breadcrumbs'
+    File:
+      '->Link()'          : 'URL'
+      '->Title'           : 'Title'
+      '->appCategory()'   : 'Category'
+      '->getExtension()'  : 'Extension'
+      '->getFileType()'   : 'File Type'
+      '->getSize()'       : 'Size'
+    i18n:
+      '::get_locale()'    : 'Default Locale'
