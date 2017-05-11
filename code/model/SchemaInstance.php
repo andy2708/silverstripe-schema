@@ -41,6 +41,8 @@ class SchemaInstance extends DataObject {
 
         if($this->exists()) {
 
+            $schema = $this->getComponent('Schema');
+
             $fields->removeByName('Properties');
             $properties = GridField::create('Properties')
                 ->setTitle('Properties')
@@ -50,7 +52,8 @@ class SchemaInstance extends DataObject {
                         ->removeComponentsByType('GridFieldAddExistingAutocompleter')
                         ->removeComponentsByType('GridFieldDeleteAction')
                         ->addComponent(new GridFieldDeleteAction(false))
-                );
+                )
+                ->setDescription('Need to know what properties are available on \'' . $schema->Title . '\' and how the values must be formatted? Check out <a href="' . $schema->SchemaOrgURL . '" title="View the ' . $schema->Title . ' schema on schema.org" target="_blank">' . $schema->SchemaOrgURL . '</a>');
             $config->getComponentByType('GridFieldDataColumns')
                 ->setFieldFormatting([
                     'isPrimary' => function($value, $item) {
