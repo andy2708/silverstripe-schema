@@ -52,6 +52,9 @@ class SchemaInstance extends DataObject {
                         ->removeComponentsByType('GridFieldAddExistingAutocompleter')
                         ->removeComponentsByType('GridFieldDeleteAction')
                         ->addComponent(new GridFieldDeleteAction(false))
+                        // Replace default detail form with my 'auto create record' version
+                        ->removeComponentsByType("GridFieldDetailForm")
+                        ->addComponent(new GridFieldDetailForm_AutoCreate())
                 )
                 ->setDescription('Need to know what properties are available on \'' . $schema->Title . '\' and how the values must be formatted? Check out <a href="' . $schema->SchemaOrgURL . '" title="View the ' . $schema->Title . ' schema on schema.org" target="_blank">' . $schema->SchemaOrgURL . '</a>');
             $config->getComponentByType('GridFieldDataColumns')
