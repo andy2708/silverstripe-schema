@@ -102,7 +102,7 @@ class SchemaObjectExtension extends DataExtension {
 
         return ($encoded)
             ? '<script type="application/ld+json">' . "\n"
-                . json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+                . json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
                 . "\n" . '</script>'
             : $data;
     }
