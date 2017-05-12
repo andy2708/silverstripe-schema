@@ -49,6 +49,35 @@ class SchemaProperty extends DataObject {
         
         $fields = parent::getCMSFields();
         
+        $fields->replaceField(
+            'Title',
+            DropdownField::create('Title')
+                ->setTitle('Title')
+                ->setEmptyString('- Please Select -')
+                ->setSource($this->populateProperties())
+        );
+        
+        $nsSource = [];
+        $schemas = SchemaInstance::get()
+            ->exclude('RelatedObjectID', 0)
+            ->sort('SchemaID', 'ASC');
+        foreach($schemas as $schema) {
+            $schemaType = $schema->getComponent('Schema')->getTitle();
+            $nsSource[$schemaType][$schema->ID] = $schema->getTitle();
+        }
+        $fields->replaceField(
+            'NestedSchemaID',
+            GroupedDropdownField::create('NestedSchemaID')
+                ->setTitle('Nested Schema')
+                /**
+                 * Won't work as per {@link https://github.com/silverstripe/silverstripe-framework/issues/4987}, consider submitting a PR to fix.
+                 */
+                ->setEmptyString('[Optional]')
+                // Array addition is a hack to temporarily resolve the above
+                ->setSource(['Disabled' => ['' => '[Optional]']] + $nsSource)
+                ->setDescription('Priority #1 - This properties value can be represented by an existing schema. Link to the existing schema to prevent duplication.')
+        );
+        
         $dvSource = [];
         $dvSourceCandidates = $this->getDynamicValueOptions();        
         $relObjClass = $this->getComponent('ParentSchema')->RelatedObjectClass;
@@ -80,14 +109,6 @@ class SchemaProperty extends DataObject {
             }
         }
         $fields->replaceField(
-            'Title',
-            DropdownField::create('Title')
-                ->setTitle('Title')
-                ->setEmptyString('- Please Select -')
-                ->setSource($this->populateProperties())
-        );
-        
-        $fields->replaceField(
             'ValueDynamic',
             GroupedDropdownField::create('ValueDynamic')
                 ->setTitle('Dynamic Value')
@@ -95,38 +116,33 @@ class SchemaProperty extends DataObject {
                  * Won't work as per {@link https://github.com/silverstripe/silverstripe-framework/issues/4987}, consider submitting a PR to fix.
                  */
                 ->setEmptyString('[Optional]')
+                // Array addition is a hack to temporarily resolve the above
                 ->setSource(['Disabled' => ['' => '[Optional]']] + $dvSource)
                 ->setDescription('Priority #2 - Populate this property dynamically using the output of a method or property.')
         );
-
+        
         $fields->fieldByName('Root.Main.ValueStatic')
-            ->setDescription('Priority #1 - A Fixed value to be used at all times. This takes priority over any other "value" settings.');
+            ->setDescription('Priority #3 - A Fixed value to be used at all times.');
 
-        /**
-         * @todo We need a way to include all DataObject instances which have no
-         * specific SchemaInstance of their own, but inherit one based on the 
-         * default schema configuration for objects of that type. These should be
-         * nestable but currently are not (the quick fix is to add an empty
-         * SchemaInstance (i.e. one with no properties) to each DataObject instance)
-         */
-        $nsSource = [];
-        $schemas = SchemaInstance::get()
-            ->exclude('RelatedObjectID', 0)
-            ->sort('SchemaID', 'ASC');
-        foreach($schemas as $schema) {
-            $schemaType = $schema->getComponent('Schema')->getTitle();
-            $relObjectTitle = $schema->getComponent('RelatedObject')->getTitle();
-            $nsSource[$schemaType][] = $relObjectTitle;
-        }
-
-        $fields->replaceField(
+        $fields->changeFieldOrder([
+            'Title',
             'NestedSchemaID',
-            GroupedDropdownField::create('NestedSchemaID')
-                ->setEmptyString('[Optional]')
-                ->setSource($nsSource)
-                ->setDescription('Priority #3 - This properties value can be represented by an existing schema. Link to the existing schema to prevent duplication.')
-                
-        );
+            'ValueDynamic',
+            'ValueStatic',
+            'ParentSchemaID'    
+        ]);
+
+        if(
+            !empty($this->NestedSchemaID)
+            && empty($this->ValueDynamic)
+            && empty($this->ValueStatic)
+        ) {
+            $fields->insertAfter(
+                'NestedSchemaID',
+                ReadonlyField::create('FallbackNote')
+                    ->setTitle('Fallback Recommendation')
+                    ->setValue('In some scenarios nesting schemas is not allowed (in order to prevent infinite nesting loops). It is highly reccomended that you add a dynamic or static value for this property, which can be served as a fallback in the above context.'));
+        }
 
         return $fields;
     }
@@ -158,28 +174,49 @@ class SchemaProperty extends DataObject {
 
     public function getDescription() {
 
-        if (!empty($this->ValueStatic)) {
-            return $this->ValueStatic;
+        $nestedSchema = $this->getComponent('NestedSchema');
+        if (is_object($nestedSchema) && $nestedSchema->exists()) {
+            return "{" . $nestedSchema->getTitle() . "}";
         }
 
         if (!empty($this->ValueDynamic)) {
             return "{" . $this->ValueDynamic . "}";
         }
 
-        $nestedSchema = $this->getComponent('NestedSchema');
-        if (is_object($nestedSchema) && $nestedSchema->exists()) {
-            return $nestedSchema->getTitle();
+        if (!empty($this->ValueStatic)) {
+            return $this->ValueStatic;
         }
 
         return "(not set)";
     }
 
-    public function getValue($sids = []) {
+    public function getValue($sids = [], $allowNesting = true) {
     
-        if (!empty($this->ValueStatic)) {
-            return $this->ValueStatic;
+        /*
+         * Priority 1
+         * (as long as nesting has not been prevented)
+         */
+        if($allowNesting) {
+            $nestedSchema = $this->getComponent('NestedSchema');
+            if (is_object($nestedSchema) && $nestedSchema->exists()) {
+                /**
+                 * To prevent infinite loops caused by mis-configured nested schemas
+                 * (i.e Person->worksFor->Organization->employee->Person) susequent
+                 * requests to include the same nested SchemaInstance will result
+                 * in the properties dynamic or static value (if set) being returned
+                 * instead. If no dynamic or static value is set for this property
+                 * an empty string is returned, meaning this property is not included
+                 * in the resulting SchemaInstance.
+                 */
+                if (in_array($nestedSchema->ID, $sids)) {
+                    return $this->getValue([], false);
+                } else {
+                    return $nestedSchema->getStructuredData(false, $sids);
+                }
+            }
         }
         
+        // Priority 2
         if (!empty($this->ValueDynamic)) {
 
             // Check for valid class name to property/method name separator
@@ -189,7 +226,8 @@ class SchemaProperty extends DataObject {
                 $separator = "->";
             } else {
                 error_log('SchemaProperty::getValue() tried to process a dymanic value with an unexpected format - "' . $this->ValueDynamic . '" - (expects separator of "::" or "->" between class name and method/property name )');
-                return "";
+                // Fallback to any static value which might be defined
+                return $this->ValueStatic;
             }
             
             // Split class name and property/method name by separator
@@ -222,7 +260,8 @@ class SchemaProperty extends DataObject {
                     )
                 ) {
                     error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies an instance based (i.e. non-static) method/property on a class name which differs from, and/or does not extend, the related object type! (Related Object = "' . json_encode($relatedObj) . '", Requested Class = "' . $className . '"');
-                    return "";
+                    // Fallback to any static value which might be defined
+                    return $this->ValueStatic;
                 }
 
                 $value = (!$isMethod)
@@ -239,16 +278,12 @@ class SchemaProperty extends DataObject {
             return $value;
         }
         
-        $nestedSchema = $this->getComponent('NestedSchema');
-        if (is_object($nestedSchema) && $nestedSchema->exists()) {
-            if (in_array($nestedSchema->ID, $sids)) {
-                return $nestedSchema->getSummary();
-            } else {
-                return $nestedSchema->getStructuredData(false, $sids);
-            }
-        }
+        /**
+         * Priority 3
+         * Might be empty (in which case this property will be excluded)
+         */
+        return $this->ValueStatic;
 
-        return "";
     }
 
     public function populateProperties() {
