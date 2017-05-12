@@ -5,7 +5,6 @@ class Schema extends DataObject {
     private static $db = [
         'Title'             => 'Varchar(255)',
         'SchemaOrgID'       => 'Varchar(255)',
-        //'PrimaryProperty'   => 'Varchar(255)',
         'SchemaOrgURL'      => 'Varchar(255)',
         'LocalDataSource'   => 'Varchar(255)', // Stored relative to the site root
         'LastUpdated'       => 'SS_DateTime'
@@ -58,17 +57,6 @@ class Schema extends DataObject {
                 ->performReadonlyTransformation()
         );
 
-        // $source = $this->getProperties()->map('Name', 'Name');
-        // asort($source);
-        // $fields->replaceField(
-        //     'PrimaryProperty',
-        //     DropdownField::create('PrimaryProperty')
-        //         ->setTitle('Primary Property')
-        //         ->setEmptyString('- Please Select -')
-        //         ->setSource($source)
-        //         ->setDescription('The most descriptive property for this schema, this property will be required on schemas of this type. If in doubt, go with the \'name\' property.')
-        // );
-
         $fields->replaceField(
             'SchemaOrgURL',
             $fields->fieldByName('Root.Main.SchemaOrgURL')
@@ -109,9 +97,6 @@ class Schema extends DataObject {
         if(empty($this->SchemaOrgID)) {
             $result->error('Schema is a required field!');
         }
-        // } elseif ($this->exists() && empty($this->PrimaryProperty)) {
-        //     $result->error('Primary Property is a required field!');
-        // }
         return $result;
     }
 

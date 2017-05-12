@@ -109,27 +109,6 @@ class SchemaInstance extends DataObject {
 
     }
 
-    /**
-     * To prevent infinite loops caused by mis-configured nested schemas (i.e
-     * Person->worksFor->Organization->employee->Person) susequent requests to
-     * include the same nested SchemaInstance will result in the output of
-     * getSummary() being returned instead.
-     * 
-     * For example, getSummary() can then then return the string "John Smith"
-     * instead of a Person schema object modeling John Smith
-     *
-     * @return String
-     */
-    public function getSummary() {
-        /**
-         * @todo:
-         * - Add logic here to lookup the primary property and return it if found
-         * - Check the primary property logic considers inherited primary properties
-         * - Prevent primary properties from having NestedSchemaID's (or flip the priority order on it's head and in getSummary() flag nested values to be skipped?)
-         */
-        return $this->getComponent('Schema')->SchemaOrgURL;
-    }
-
     public function getDefaultSchema() {
         return SchemaInstance::get()
             ->filter([
@@ -215,68 +194,5 @@ class SchemaInstance extends DataObject {
                 . "\n" . '</script>'
             : $data;
     }
-
-    // public function onAfterWrite() {
-
-    //     parent::onAfterWrite();
-
-    //     global $addPrimaryProp;
-    //     global $primaryPropType;
-        
-    //     $primaryPropType = $this->getComponent('Schema')->PrimaryProperty;
-    //     $props = $this->getComponents('Properties');
-    //     $addPrimaryProp = true;
-        
-    //     /*
-    //      * Reset the status of all related SchemaProperties which are marked as
-    //      * primary, but do not match the type specified in 'PrimaryProperty'. Also
-    //      * flag it if we already have a property of the primary type (marking it
-    //      * as so if needed)
-    //      */
-        
-    //     $props->each(
-    //         function($item) {
-
-    //             /*
-    //              * Ensure the relevant variables defined outside the scope of
-    //              * this anonymous function have global scope
-    //              */
-    //             global $addPrimaryProp;
-    //             global $primaryPropType;
-
-    //             if($item->Title == $primaryPropType) {
-    //                 // No need to add a property of this type if one already exists
-    //                 $addPrimaryProp = false;
-    //                 // If this property is not marked as primary, update it to be so
-    //                 if(empty($item->isPrimary)) {
-    //                     $item->isPrimary = 1;
-    //                     $item->write();
-    //                 }
-    //             } elseif (!empty($item->isPrimary)) {
-    //                 /*
-    //                  * Any properties which don't reflect the type set in
-    //                  * 'PrimaryProperty' but are flaged as primary shouldn't be,
-    //                  * so reset them
-    //                  */
-    //                 $item->isPrimary = 0;
-    //                 $item->write();
-    //             }
-
-    //         }
-    //     );
-     
-    //     /*
-    //      * Create a new SchemaProperty of the same type as 'PrimaryProperty' if
-    //      * one does not exist
-    //      */
-    //     if($addPrimaryProp) {
-    //         $prop = new SchemaProperty();
-    //         $prop->ParentSchemaID = $this->ID;
-    //         $prop->Title = $primaryPropType;
-    //         $prop->isPrimary = 1;
-    //         $prop->write();
-    //     }
-
-    // }
 
 }

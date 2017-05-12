@@ -5,8 +5,7 @@ class SchemaProperty extends DataObject {
     private static $db = [
         'Title'         => 'Varchar(255)',
         'ValueStatic'   => 'Varchar(255)',
-        'ValueDynamic'  => 'Varchar(255)',
-        //'isPrimary'     => 'Boolean'
+        'ValueDynamic'  => 'Varchar(255)'
     ];
 
     private static $has_one = [
@@ -16,13 +15,8 @@ class SchemaProperty extends DataObject {
 
     private static $summary_fields = [
         'Title'             => 'Property',
-        'getDescription'    => 'Value',
-        //'isPrimary'         => 'Primary?'
+        'getDescription'    => 'Value'
     ];
-
-    // private static $default_sort = [
-    //     'isPrimary' => 'DESC'
-    // ];
 
     /**
      * @config
@@ -85,9 +79,6 @@ class SchemaProperty extends DataObject {
                 $dvSource[$category][$category . $key] = $value;
             }
         }
-        
-        //$fields->removeByName('isPrimary');
-
         $fields->replaceField(
             'Title',
             DropdownField::create('Title')
