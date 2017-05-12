@@ -28,20 +28,22 @@ Schema:
 SchemaProperty:
   core_dynamic_value_options:
     Member:
-      '->getName()'       : 'Members Full Name'
-      '->FirstName'       : 'Members First Name'
-      '->Surname'         : 'Members Surname'
-      '->Email'           : 'Members E-mail'
-      '->Locale'          : 'Members Language'
+      '->getName()'       : 'Full Name'
+      '->FirstName'       : 'First Name'
+      '->Surname'         : 'Surname'
+      '->Email'           : 'E-mail'
+      '->Locale'          : 'Language'
     SiteConfig:
       '->Title'           : 'Site Name'
       '->Tagline'         : 'Site Tag Line'
     SiteTree:
       '->Link()'          : 'URL'
-      '->getMenuTitle()'  : 'Title'
+      '->getTitle()'      : 'Title'
+      '->getMenuTitle()'  : 'Menu Title'
       '->Breadcrumbs()'   : 'Breadcrumbs'
       '->Created'         : 'Created At'
       '->LastEdited'      : 'Edited On'
+      '->MetaDescription' : 'Meta Desc.'
     File:
       '->Link()'          : 'URL'
       '->Title'           : 'Title'
