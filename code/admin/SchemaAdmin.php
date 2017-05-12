@@ -41,6 +41,7 @@ class SchemaAdmin extends ModelAdmin {
                 $this->sanitiseClassName($this->modelClass)
             );
             $config = $gridField->getConfig();
+
             $config->getComponentByType('GridFieldDetailForm')->setItemEditFormCallback(
                 function($form, $itemRequest) {
                     
@@ -48,7 +49,7 @@ class SchemaAdmin extends ModelAdmin {
 
                     $extendedClasses = [];
                     foreach(ClassInfo::subclassesFor('DataObject') as $candidate) {
-                        if($candidate::has_extension('SchemaExtension')) {
+                        if($candidate::has_extension('SchemaObjectExtension')) {
                             $extendedClasses[$candidate] = $candidate;
                         }
                     }
