@@ -27,7 +27,7 @@ class SchemaProperty extends DataObject {
     /**
      * @config
      */
-    private static $dynamic_value_default_options = [];
+    private static $dynamic_value_core_options = [];
     private static $dynamic_value_override_options = [];
 
     /**
@@ -41,14 +41,14 @@ class SchemaProperty extends DataObject {
 
     public function getDynamicValueOptions() {
 
-        $options = Config::inst()->get('SchemaProperty', 'dynamic_value_default_options');
-        $overrides = Config::inst()->get('SchemaProperty', 'dynamic_value_override_options');
+        $defaults = Config::inst()->get('SchemaProperty', 'core_dynamic_value_options');
+        $overrides = Config::inst()->get('SchemaProperty', 'user_dynamic_value_options');
 
         if(isset($overrides)) {
-            Config::merge_array_high_into_low($options, $overrides);
+            Config::merge_array_high_into_low($defaults, $overrides);
         }
 
-        return $options;
+        return $defaults;
     }
 
     public function getCMSFields() {
@@ -237,6 +237,12 @@ class SchemaProperty extends DataObject {
                 $value = (!$isMethod)
                     ? $relatedObj->getField($fieldName)
                     : $relatedObj->{$fieldName}();
+
+                if(is_object($value)) {
+                    $value = (method_exists($value, 'getTitle'))
+                        ? $value->getTitle()
+                        : (string)$value;
+                }
             }
 
             return $value;

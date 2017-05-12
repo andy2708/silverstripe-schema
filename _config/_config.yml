@@ -7,26 +7,30 @@ After:
 DevelopmentAdmin:
   registered_controllers:
       build:
-        controller: 'DevBuildExtension'
+        controller: 'SchemaBuildExtension'
 Member:
   extensions:
-    - SchemaExtension
+    - SchemaObjectExtension
 SiteConfig:
   extensions:
-    - SchemaExtension
+    - SchemaObjectExtension
 SiteTree:
   extensions:
-    - SchemaExtension
+    - SchemaObjectExtension
 File:
   extensions:
-    - SchemaExtension
+    - SchemaObjectExtension
+Schema:
+  core_default_enabled_schemas:
+    - Organization
+    - WebSite
+    - WebPage
 SchemaProperty:
-  dynamic_value_default_options:
+  core_dynamic_value_options:
     Member:
       '->getName()'       : 'Members Full Name'
       '->FirstName'       : 'Members First Name'
       '->Surname'         : 'Members Surname'
-      '->DOB'             : 'Members DOB'
       '->Email'           : 'Members E-mail'
       '->Locale'          : 'Members Language'
     SiteConfig:
@@ -36,6 +40,8 @@ SchemaProperty:
       '->Link()'          : 'URL'
       '->getMenuTitle()'  : 'Title'
       '->Breadcrumbs()'   : 'Breadcrumbs'
+      '->Created'         : 'Created At'
+      '->LastEdited'      : 'Edited On'
     File:
       '->Link()'          : 'URL'
       '->Title'           : 'Title'

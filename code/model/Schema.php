@@ -16,7 +16,7 @@ class Schema extends DataObject {
     ];
 
     private static $summary_fields = [
-        'Title'         => "Schema Type",
+        'Title'         => 'Schema Type',
         'SchemaOrgURL'  => 'schema.org URL',
         'LastUpdated'   => 'Last Updated'
     ];
@@ -120,6 +120,19 @@ class Schema extends DataObject {
             . static::$VocabularyFileName
             . "."
             . static::$DataSource['format'];
+    }
+
+    public static function getDefaultEnabledSchemas() {
+
+        $defaults = Config::inst()->get('Schema', 'core_default_enabled_schemas');
+        $overrides = Config::inst()->get('Schema', 'user_default_enabled_schemas');
+
+        if(isset($overrides)) {
+            Config::merge_array_high_into_low($defaults, $overrides);
+        }
+
+        return $defaults;
+
     }
 
     /**

@@ -1,6 +1,6 @@
 <?php
 
-class SchemaExtension extends DataExtension {
+class SchemaObjectExtension extends DataExtension {
     
     private static $has_many = [    
         'SchemaInstances' => 'SchemaInstance.RelatedObject'
