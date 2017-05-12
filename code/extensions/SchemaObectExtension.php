@@ -38,8 +38,7 @@ class SchemaObjectExtension extends DataExtension {
                     ->setAttribute('readonly', 'readonly')
             );
         }
-
-
+        
         return $fields;
     }
 
@@ -53,18 +52,37 @@ class SchemaObjectExtension extends DataExtension {
      * RelatedObjectID was 0)
      */
     public function getDefaultSchema() {
-        $default = SchemaInstance::get()
+        
+        $classes = ClassInfo::ancestry($this->getOwner()->ClassName);
+
+        $candidates = SchemaInstance::get()
             ->filter([
                 'RelatedObjectID' => 0,
-                'RelatedObjectClass' => $this->getOwner()->ClassName
+                'RelatedObjectClass' => $classes
             ])
-            ->sort('Sort', 'ASC')
-            ->first();
-        if(!is_object($default) || !$default->exists()) {
+            ->sort('RelatedObjectClass', 'ASC');
+
+        // If no results
+        if(!is_object($candidates) || !$candidates->exists()) {
             return SchemaInstance::create();
         }
-        $default->RelatedObjectID = $this->getOwner()->ID;
-        return $default;
+
+        /*
+         * If one or more candidates, find the most specific default SchemaInstance
+         * based on this objects class and the default schemas related object class
+         * i.e. given SiteTree > Page > HomePage and a default schema set up for 
+         * both Page and HomePage, when we load the homepage, we should get the 
+         * HomePage default schema over the Page default schema.
+         */
+        foreach(array_reverse($classes) as $class) {
+            if($default = $candidates->find('RelatedObjectClass', $class)) {
+                $default->RelatedObjectID = $this->getOwner()->ID;
+                return $default;
+            }   
+        }
+        
+        // Fallback (this shouldn't be possible)
+        return SchemaInstance::create();
     }
 
     public function getStructuredData($encoded = true, $inheritedOnly = false, $summaryOnly = false) {
