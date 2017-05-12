@@ -2,10 +2,6 @@
 
 class SchemaInstance extends DataObject {
 
-    private static $db = [
-        'Sort'  => 'Int'
-    ];
-
     private static $has_one = [
         'RelatedObject' => 'DataObject',
         'Schema'        => 'Schema'
@@ -24,11 +20,6 @@ class SchemaInstance extends DataObject {
     public function getCMSFields() {
 
         $fields = parent::getCMSFields();
-
-        /**
-         * @todo Add drag & drop interface on relvant GridFields
-         */
-        $fields->removeByName('Sort');
 
         $fields->findOrMakeTab('Root.Main')->Fields()->replaceField(
             'Schema',
