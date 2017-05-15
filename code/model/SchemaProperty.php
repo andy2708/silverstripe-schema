@@ -246,12 +246,41 @@ class SchemaProperty extends DataObject {
                     $fieldName = preg_replace('/[\$]/', '', $fieldName);
                 }
             }
+            
+            $relatedObj = $this->getRelatedObject();
+            
+            if($isMethod) {
+
+                if (!method_exists($className, $fieldName)) {
+                    error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies a method/class combination which does not exist! (Requested Class = "' . $className . '", Requested Method = "' . $fieldName . '"');
+                    // Fallback to any static value which might be defined
+                    return $this->ValueStatic;
+                }
+
+            } else {
+                
+                if($separator === "::") {
+                    if (!property_exists($className, $fieldName)) {
+                        error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies a property/class combination which does not exist! (Requested Class = "' . $className . '", Requested Property = "' . $fieldName . '"');
+                        // Fallback to any static value which might be defined
+                        return $this->ValueStatic;
+                    }
+                } elseif (!in_array($fieldName, ['ID', 'Created', 'LastEdited'])) {
+                    $field = $relatedObj->db($fieldName);
+                    $hasField = (empty($field)) ? false : true;
+                    if (!$hasField) {
+                         error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies a property/class combination which does not exist! (Requested Class = "' . $className . '", Requested Property = "' . $fieldName . '"');
+                        // Fallback to any static value which might be defined
+                        return $this->ValueStatic;
+                    }
+                }
+
+            }
 
             if($separator === "::") {
                 $value = (!$isMethod) ? $className::${$fieldName} : $className::{$fieldName}();
             } else {
 
-                $relatedObj = $this->getRelatedObject();
                 if(
                     !$relatedObj->exists()
                     || (
