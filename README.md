@@ -40,7 +40,7 @@ composer require quadra-digital/silverstripe-schema
 * Run a /dev/build and /?flush=all against the website
 * Log in to your websites CMS and checkout the 'Schemas' tab where you can enable additional schemas from schema.org and set up a default schema for each relevant DataObject
 * All DataObjects which have been extended (as per above) will have an additional tab in the CMS of 'Schemas' where you can add and overload schemas for that individual DataObject
-* Add `$getStructuredData()` in your Page.ss template and other relevant templates, giving consideration to scope. See [/docs/en/examples/templates/](/docs/en/templates/) for examples.
+* Add `$getStructuredData()` in your Page.ss template and other relevant templates, giving consideration to scope. See [/docs/en/examples/templates/](/docs/en/examples/templates/) for examples.
 
 ## License
 This module uses the BSD 3-Clause license. See the [LICENCE.md](/LICENCE.md) file for the full license.
