@@ -53,6 +53,7 @@ All rights reserved.
 ##Roadmap
 ### To Do
 * Move schema.org scynchronisation/updates to it's own build task (and stop running it on /dev/build which with >= 10 schemas configured is painfully slow)
+* Include default scehmas in nested schema dropdown
 * Provide detailed documentation in [/docs/en](/docs/en)
 * Look into performance impact of structured data generation, consider caching techniques and other performance improvements
 * Refactor codebase for PSR-2 compliance
