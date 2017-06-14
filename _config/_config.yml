@@ -1,0 +1,55 @@
+---
+Name: schema
+After:
+  - 'framework'
+  - 'cms'
+---
+DevelopmentAdmin:
+  registered_controllers:
+      build:
+        controller: 'SchemaBuildExtension'
+Member:
+  extensions:
+    - SchemaObjectExtension
+SiteConfig:
+  extensions:
+    - SchemaObjectExtension
+SiteTree:
+  extensions:
+    - SchemaObjectExtension
+File:
+  extensions:
+    - SchemaObjectExtension
+Schema:
+  core_default_enabled_schemas:
+    - Organization
+    - WebSite
+    - WebPage
+SchemaProperty:
+  core_dynamic_value_options:
+    Member:
+      '->getName()'         : 'Full Name'
+      '->FirstName'         : 'First Name'
+      '->Surname'           : 'Surname'
+      '->Email'             : 'E-mail'
+      '->Locale'            : 'Language'
+    SiteConfig:
+      '->Title'             : 'Site Name'
+      '->Tagline'           : 'Site Tag Line'
+    SiteTree:
+      '->AbsoluteLink()'    : 'URL'
+      '->getTitle()'        : 'Title'
+      '->getMenuTitle()'    : 'Menu Title'
+      '->Breadcrumbs()'     : 'Breadcrumbs'
+      '->Created'           : 'Created At'
+      '->LastEdited'        : 'Edited On'
+      '->MetaDescription'   : 'Meta Desc.'
+    File:
+      '->getAbsoluteURL()'  : 'URL'
+      '->Title'             : 'Title'
+      '->appCategory()'     : 'Category'
+      '->getExtension()'    : 'Extension'
+      '->getFileType()'     : 'File Type'
+      '->getSize()'         : 'Size'
+    i18n:
+      '::get_locale()'      : 'Default Locale'
