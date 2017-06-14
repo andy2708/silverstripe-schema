@@ -8,7 +8,7 @@
         <link ref="icon" href="/favicon.ico" type="image/x-icon" />
 
         <%--
-            Page Specific: Structured Data (in JSON-LD format) to add aditional
+            Site Specific: Structured Data (in JSON-LD format) to add aditional
             information in SERP's and Google Knowledge Graph etc
         --%>
         $SiteConfig.getStructuredData()
