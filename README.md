@@ -37,6 +37,7 @@ composer require quadra-digital/silverstripe-schema
     * Which of your custom DataObjects get extended to make use of schemas
     * The schemas enabled by default
     * The class properties and methods used to populate structured data dynamically
+* Make sure the /data-sources/ directory gives read & write permission to the web server (i.e apache/httpd)
 * Run a /dev/build and /?flush=all against the website
 * Log in to your websites CMS and checkout the 'Schemas' tab where you can enable additional schemas from schema.org and set up a default schema for each relevant DataObject
 * All DataObjects which have been extended (as per above) will have an additional tab in the CMS of 'Schemas' where you can add and overload schemas for that individual DataObject
