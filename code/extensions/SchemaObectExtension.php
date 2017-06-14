@@ -1,8 +1,16 @@
 <?php
 
+/**
+ * Schema Object Extension
+ *
+ * A data extension which enables the schema modules functionality on any
+ * DataObject it extends
+ *
+ * @author Joe Harvey <joe.harvey@quadradigital.co.uk>
+ */
 class SchemaObjectExtension extends DataExtension {
     
-    private static $has_many = [    
+    private static $has_many = [
         'SchemaInstances' => 'SchemaInstance.RelatedObject'
     ];
 
@@ -42,11 +50,11 @@ class SchemaObjectExtension extends DataExtension {
         return $fields;
     }
 
-    /** 
+    /**
      * Attempts to find the default schema for object of this type (e.g. Member)
      * If it finds one, it's 'soft linked' to this particular instance of that
      * object (e.g. Member #17) by setting it's RelatedObjectID (which would
-     * origianlly be 0, as it's a default schema) to the current objects ID. 
+     * originally be 0, as it's a default schema) to the current objects ID.
      * Calls to SchemaInstance->getComponent('RelatedObject') will then return
      * THIS DataObject, instead of returning an empty object (because
      * RelatedObjectID was 0)

@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * Grid Field Detail Form - 'Auto Create'
+ *
  * Extends the standard detail form (add, edit and view) to mimic the behaviour
  * of {@link SiteTree} and {@link CMSPageAddController} i.e. when the detail
  * form is used to add a new record, using the URL format <FormURL>/field/<GridFieldName>/item/new,
@@ -8,6 +10,8 @@
  * record and ID) and redirect to the new records edit form. This means we can
  * use GridFieldAddExistingAutocompleter straight away instead of having to manually
  * save the new record for the first time.
+ *
+ * @author Joe Harvey <joe.harvey@quadradigital.co.uk>
  */
 class GridFieldDetailForm_AutoCreate extends GridFieldDetailForm {
 

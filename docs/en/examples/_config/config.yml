@@ -1,0 +1,32 @@
+---
+Name: mysite
+After:
+  - 'framework/*'
+  - 'cms/*'
+---
+# YAML configuration for SilverStripe
+# See http://doc.silverstripe.org/framework/en/topics/configuration
+# Caution: Indentation through two spaces, not tabs
+SSViewer:
+  theme: 'simple'
+Schema:
+  user_default_enabled_schemas:
+    - Article
+    - Blog
+    - CreativeWork
+    - DigitalDocument
+    - Event
+    - ImageObject
+    - JobPosting
+    - LocalBusiness
+    - Person
+    - PostalAddress
+    - Service
+SchemaProperty:
+  user_dynamic_value_options:
+    BlogPost:
+      '->getAuthor()' : 'Blog Author'
+    Member:
+      '->JobTitle'      : 'Job Title'
+      '->TwitterLink'   : 'Twitter URL'
+      '->LinkedInLink'  : 'LinkedIn URL'

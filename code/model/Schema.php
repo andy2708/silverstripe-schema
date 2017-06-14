@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Schema
+ *
+ * An object to model the representation of the schema.org schema/vocabulariy
+ * itself, in the CMS
+ *
+ * @author Joe Harvey <joe.harvey@quadradigital.co.uk>
+ */
 class Schema extends DataObject {
     
     private static $db = [

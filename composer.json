@@ -1,19 +1,34 @@
 {
     "name": "quadra-digital/silverstripe-schema",
     "description": "Provides an interface for adding schema.org based structured data.",
+    "homepage": "https://github.com/Quadra-Digital/silverstripe-mailchimp-module",
+    "keywords": [
+        "silverstripe",
+        "schema",
+        "schema.org",
+        "structured data",
+        "JSON-LD"
+    ],
     "type": "silverstripe-module",
     "require": {
-        "silverstripe/cms": "^3.2"
+        "silverstripe/cms": "^3.2"  
+    },
+    "require-dev": {
+        "fojuth/readmegen": "~1.1"
     },
     "license": "BSD-3-Clause",
+    "minimum-stability": "stable",
+    "extra": {
+        "installer-name": "silverstripe-schema"
+    },
     "authors": [
         {
             "name": "Joe Harvey",
             "email": "joe.harvey@quadradigital.co.uk"
         }
     ],
-    "minimum-stability": "stable",
-    "extra": {
-        "installer-name": "silverstripe-schema"
+    "support": {
+        "email": "developers@quadradigital.co.uk",
+        "issues": "https://github.com/Quadra-Digital/silverstripe-schema/issues"
     }
 }

@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Schema Propert
+ *
+ * An object to model the properties/fields which each scehma is made up of
+ *
+ * @author Joe Harvey <joe.harvey@quadradigital.co.uk>
+ */
 class SchemaProperty extends DataObject {
     
     private static $db = [

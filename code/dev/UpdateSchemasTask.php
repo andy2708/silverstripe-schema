@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * Update Schema Task
+ *
+ * An extenison of BuildTask, which is called during the /dev/build process, used
+ * to do the grunt work for adding/updating schema data from schema.org
+ *
+ * @author Joe Harvey <joe.harvey@quadradigital.co.uk>
+ */
 class UpdateSchemasTask extends BuildTask {
 
     protected $title = 'Update Schema.org Data Sources';

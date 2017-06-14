@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Schema Instance
+ *
+ * An individual instance of a schema.org schema, related to a particular DataObject
+ *
+ * @author Joe Harvey <joe.harvey@quadradigital.co.uk>
+ */
 class SchemaInstance extends DataObject {
 
     private static $has_one = [
