@@ -50,7 +50,7 @@ This module uses the BSD 3-Clause license. See the [LICENCE.md](/LICENCE.md) fil
 Copyright (c) 2017, [Quadrahedron Limited](https://www.quadradigital.co.uk)
 All rights reserved.
 
-##Roadmap
+## Roadmap
 ### To Do
 * Move schema.org scynchronisation/updates to it's own build task (and stop running it on /dev/build which with >= 10 schemas configured is painfully slow)
 * Improve logic in SchemaProperty::getValue() which deals with dynamic values which return an object. Currently this just returns $object->getTitle() or (string)$object but should check for valid output from `$object->getStructuredData()`, whilst still giving consideration to potential infinite nesting issues.
