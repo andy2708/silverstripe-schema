@@ -53,10 +53,12 @@ All rights reserved.
 ##Roadmap
 ### To Do
 * Move schema.org scynchronisation/updates to it's own build task (and stop running it on /dev/build which with >= 10 schemas configured is painfully slow)
-* Include default scehmas in nested schema dropdown
+* Improve logic in SchemaProperty::getValue() which deals with dynamic values which return an object. Currently this just returns $object->getTitle() or (string)$object but should check for valid output from `$object->getStructuredData()`, whilst still giving consideration to potential infinite nesting issues.
+* Figure out some way of including inherited schemas (from a certain DO's default schema) in nested schema dropdown, even though they don't strictly exist (with an ID etc). *Note*: The current workaround for this is to add a more specific schema with no properties on the individual DO you wish to link to. 
 * Provide detailed documentation in [/docs/en](/docs/en)
 * Look into performance impact of structured data generation, consider caching techniques and other performance improvements
 * Refactor codebase for PSR-2 compliance
+* Review and ensure PHP7 support
 * Allow for multiple nested schemas rather than just one, allowing for CMS configuration of things like Organisation:Employes[Staff1, Staff2, Staff3] rather than only programmatically
 * Include JSON and schema.org validation of resulting output
 * Include 'diff' process to identify new/updated/deprecated schema properties during schema.org sync process and notify end users of newly available or removed options
