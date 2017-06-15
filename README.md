@@ -13,7 +13,7 @@ The module provides a CMS interface allowing website maintainers to create dynam
 * Ability to configure which schemas are enabled via the CMS (for end-users) and programmatically (for developers) 
 
 ## Version
-`0.1.0-alpha` - This module is in use in a number of production environments, so should be relativly stable however, it has been built with only Quadra's requirements in mind and is yet to be reviewed by any external parties. The current version is therefore an alpha, rather than beta or stable, to allow for potentially breaking changes to come in via [pull requests](https://github.com/Quadra-Digital/silverstripe-schema/pulls).
+`0.1.2-alpha` - This module is in use in a number of production environments, so should be relativly stable however, it has been built with only Quadra's requirements in mind and is yet to be reviewed by any external parties. The current version is therefore an alpha, rather than beta or stable, to allow for potentially breaking changes to come in via [pull requests](https://github.com/Quadra-Digital/silverstripe-schema/pulls).
 
 ## Requirements
 [`silverstripe/cms: ~3.5`](https://github.com/silverstripe/silverstripe-cms/tree/3.5)
