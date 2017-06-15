@@ -33,7 +33,7 @@ composer require quadra-digital/silverstripe-schema
 * Place the module directory in the sites web root (i.e. at the same level as /mysite)
 
 ## Configuration
-* [optional - see the [sample config.yml file](/docs/en/examples/_config/config.yml) for an example] Using your mysite config.yml configure:
+* [optional] Using your mysite config.yml (see the [sample config.yml file](/docs/en/examples/_config/config.yml) for an example) configure:
     * Which of your custom DataObjects get extended to make use of schemas
     * The schemas enabled by default
     * The class properties and methods used to populate structured data dynamically
@@ -64,9 +64,7 @@ All rights reserved.
 * Include 'diff' process to identify new/updated/deprecated schema properties during schema.org sync process and notify end users of newly available or removed options
 
 ### Known Issues
-None
-
-[You can report an issue here](https://github.com/Quadra-Digital/silverstripe-schema/issues)
+See the modules [GitHub issues](https://github.com/Quadra-Digital/silverstripe-schema/issues) for an up to date list, you can also submit your own issues.
 
 ## Contact
 This module is built by [Quadra Digital](https://www.quadradigital.co.uk) and has been made open source for free, we are unlikely to be able to offer much support however if you have any queries regarding usage, licensing, bugs or improvements please use one of the appropriate contact below.
