@@ -258,28 +258,42 @@ class SchemaProperty extends DataObject {
             
             if($isMethod) {
 
-                if (!method_exists($className, $fieldName)) {
-                    error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies a method/class combination which does not exist! (Requested Class = "' . $className . '", Requested Method = "' . $fieldName . '"');
-                    // Fallback to any static value which might be defined
-                    return $this->ValueStatic;
+                if ($separator === "::") {
+                    if (!method_exists($className, $fieldName)) {
+                        error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies a method/class combination which does not exist! (Requested Class = "' . $className . '", Requested Method = "' . $fieldName . '"');
+                        // Fallback to any static value which might be defined
+                        return $this->ValueStatic;
+                    }
+                } elseif ($separator === "->") {
+                    if (!$relatedObj->hasMethod($fieldName)) {
+                        error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies a method/class combination which does not exist! (Requested Class = "' . $className . '", Requested Method = "' . $fieldName . '"');
+                        // Fallback to any static value which might be defined
+                        return $this->ValueStatic;
+                    }
+                } else {
+                    error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies an unknown separator "' . $separator . '"');
+                        // Fallback to any static value which might be defined
+                        return $this->ValueStatic;
                 }
 
             } else {
                 
-                if($separator === "::") {
+                if ($separator === "::") {
                     if (!property_exists($className, $fieldName)) {
                         error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies a property/class combination which does not exist! (Requested Class = "' . $className . '", Requested Property = "' . $fieldName . '"');
                         // Fallback to any static value which might be defined
                         return $this->ValueStatic;
                     }
-                } elseif (!in_array($fieldName, ['ID', 'Created', 'LastEdited'])) {
-                    $field = $relatedObj->db($fieldName);
-                    $hasField = (empty($field)) ? false : true;
-                    if (!$hasField) {
+                } elseif ($separator === "->") {
+                    if (!$relatedObj->hasField($fieldName)) {
                          error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies a property/class combination which does not exist! (Requested Class = "' . $className . '", Requested Property = "' . $fieldName . '"');
                         // Fallback to any static value which might be defined
                         return $this->ValueStatic;
                     }
+                } else {
+                    error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies an unknown separator "' . $separator . '"');
+                        // Fallback to any static value which might be defined
+                        return $this->ValueStatic;
                 }
 
             }

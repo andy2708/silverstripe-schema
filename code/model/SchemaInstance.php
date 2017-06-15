@@ -116,7 +116,6 @@ class SchemaInstance extends DataObject {
                 'RelatedObjectID' => 0,
                 'SchemaID' => $this->SchemaID
             ])
-            ->sort('Sort', 'ASC')
             ->first();
     }
 

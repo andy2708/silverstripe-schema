@@ -33,14 +33,15 @@ composer require quadra-digital/silverstripe-schema
 * Place the module directory in the sites web root (i.e. at the same level as /mysite)
 
 ## Configuration
-* [optional - see the [sample config.yml file](/docs/en/examples/_config/config.yml) for an example] Using your mysite config.yml configure:
+* [optional] Using your mysite config.yml (see the [sample config.yml file](/docs/en/examples/_config/config.yml) for an example) configure:
     * Which of your custom DataObjects get extended to make use of schemas
     * The schemas enabled by default
     * The class properties and methods used to populate structured data dynamically
+* Make sure the /data-sources/ directory gives read & write permission to the web server (i.e apache/httpd)
 * Run a /dev/build and /?flush=all against the website
 * Log in to your websites CMS and checkout the 'Schemas' tab where you can enable additional schemas from schema.org and set up a default schema for each relevant DataObject
 * All DataObjects which have been extended (as per above) will have an additional tab in the CMS of 'Schemas' where you can add and overload schemas for that individual DataObject
-* Add `$getStructuredData()` in your Page.ss template and other relevant templates, giving consideration to scope. See [/docs/en/examples/templates/](/docs/en/templates/) for examples.
+* Add `$getStructuredData()` in your Page.ss template and other relevant templates, giving consideration to scope. See [/docs/en/examples/templates/](/docs/en/examples/templates/) for examples.
 
 ## License
 This module uses the BSD 3-Clause license. See the [LICENCE.md](/LICENCE.md) file for the full license.
@@ -49,19 +50,21 @@ This module uses the BSD 3-Clause license. See the [LICENCE.md](/LICENCE.md) fil
 Copyright (c) 2017, [Quadrahedron Limited](https://www.quadradigital.co.uk)
 All rights reserved.
 
-##Roadmap
+## Roadmap
 ### To Do
+* Move schema.org scynchronisation/updates to it's own build task (and stop running it on /dev/build which with >= 10 schemas configured is painfully slow)
+* Improve logic in SchemaProperty::getValue() which deals with dynamic values which return an object. Currently this just returns $object->getTitle() or (string)$object but should check for valid output from `$object->getStructuredData()`, whilst still giving consideration to potential infinite nesting issues.
+* Figure out some way of including inherited schemas (from a certain DO's default schema) in nested schema dropdown, even though they don't strictly exist (with an ID etc). *Note*: The current workaround for this is to add a more specific schema with no properties on the individual DO you wish to link to. 
 * Provide detailed documentation in [/docs/en](/docs/en)
 * Look into performance impact of structured data generation, consider caching techniques and other performance improvements
 * Refactor codebase for PSR-2 compliance
+* Review and ensure PHP7 support
 * Allow for multiple nested schemas rather than just one, allowing for CMS configuration of things like Organisation:Employes[Staff1, Staff2, Staff3] rather than only programmatically
 * Include JSON and schema.org validation of resulting output
 * Include 'diff' process to identify new/updated/deprecated schema properties during schema.org sync process and notify end users of newly available or removed options
 
 ### Known Issues
-None
-
-[You can report an issue here](https://github.com/Quadra-Digital/silverstripe-schema/issues)
+See the modules [GitHub issues](https://github.com/Quadra-Digital/silverstripe-schema/issues) for an up to date list, you can also submit your own issues.
 
 ## Contact
 This module is built by [Quadra Digital](https://www.quadradigital.co.uk) and has been made open source for free, we are unlikely to be able to offer much support however if you have any queries regarding usage, licensing, bugs or improvements please use one of the appropriate contact below.
