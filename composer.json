@@ -1,7 +1,7 @@
 {
     "name": "quadra-digital/silverstripe-schema",
     "description": "Provides an interface for adding schema.org based structured data.",
-    "homepage": "https://github.com/Quadra-Digital/silverstripe-mailchimp-module",
+    "homepage": "https://github.com/Quadra-Digital/silverstripe-schema",
     "keywords": [
         "silverstripe",
         "schema",
