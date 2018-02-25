@@ -8,7 +8,7 @@
  * @author Joe Harvey <joe.harvey@quadradigital.co.uk>
  */
 class SchemaProperty extends DataObject {
-    
+
     private static $db = [
         'Title'         => 'Varchar(255)',
         'ValueStatic'   => 'Varchar(255)',
@@ -16,8 +16,11 @@ class SchemaProperty extends DataObject {
     ];
 
     private static $has_one = [
-        'NestedSchema'  => 'SchemaInstance',
-        'ParentSchema'  => 'SchemaInstance'
+      'ParentSchema'  => 'SchemaInstance'
+    ];
+
+    private static $has_many = [
+      'NestedSchemas' => 'SchemaInstance'
     ];
 
     private static $summary_fields = [
@@ -53,9 +56,9 @@ class SchemaProperty extends DataObject {
     }
 
     public function getCMSFields() {
-        
+
         $fields = parent::getCMSFields();
-        
+
         $fields->replaceField(
             'Title',
             DropdownField::create('Title')
@@ -63,7 +66,7 @@ class SchemaProperty extends DataObject {
                 ->setEmptyString('- Please Select -')
                 ->setSource($this->populateProperties())
         );
-        
+
         $nsSource = [];
         $schemas = SchemaInstance::get()
             ->exclude('RelatedObjectID', 0)
@@ -84,13 +87,25 @@ class SchemaProperty extends DataObject {
                 ->setSource(['Disabled' => ['' => '[Optional]']] + $nsSource)
                 ->setDescription('Priority #1 - This properties value can be represented by an existing schema. Link to the existing schema to prevent duplication.')
         );
-        
+
+        $fields->removeByName('NestedSchemas');
+        $instanceGridField = GridField::create('NestedSchemas')
+          ->setTitle('Nested Schemas')
+          ->setList(
+              $this->getComponents('NestedSchemas')
+            )
+          ->setConfig(
+              $config = GridFieldConfig_RecordEditor::create()
+            )
+          ->setDescription('Priority #1 - This properties value can be represented by an existing schema. Link to the existing schema to prevent duplication.');
+        $fields->addFieldToTab('Root.Main',$instanceGridField)  ;
+
         $dvSource = [];
-        $dvSourceCandidates = $this->getDynamicValueOptions();        
+        $dvSourceCandidates = $this->getDynamicValueOptions();
         $relObjClass = $this->getComponent('ParentSchema')->RelatedObjectClass;
         foreach ($dvSourceCandidates as $category => $values) {
             foreach ($values as $key => $value) {
-                
+
                 if (
                     $relObjClass !== $category
                     && !is_subclass_of($relObjClass, $category)
@@ -98,7 +113,7 @@ class SchemaProperty extends DataObject {
                 ) {
                     /*
                      * Do not include instance based method/property options
-                     * where the source class is not of the same type as the 
+                     * where the source class is not of the same type as the
                      * related DataObject.
                      */
                     continue;
@@ -127,7 +142,7 @@ class SchemaProperty extends DataObject {
                 ->setSource(['Disabled' => ['' => '[Optional]']] + $dvSource)
                 ->setDescription('Priority #2 - Populate this property dynamically using the output of a method or property.')
         );
-        
+
         $fields->fieldByName('Root.Main.ValueStatic')
             ->setDescription('Priority #3 - A Fixed value to be used at all times.');
 
@@ -136,7 +151,7 @@ class SchemaProperty extends DataObject {
             'NestedSchemaID',
             'ValueDynamic',
             'ValueStatic',
-            'ParentSchemaID'    
+            'ParentSchemaID'
         ]);
 
         if(
@@ -181,9 +196,9 @@ class SchemaProperty extends DataObject {
 
     public function getDescription() {
 
-        $nestedSchema = $this->getComponent('NestedSchema');
+        $nestedSchema = $this->getComponents('NestedSchemas')->first();
         if (is_object($nestedSchema) && $nestedSchema->exists()) {
-            return "{" . $nestedSchema->getTitle() . "}";
+            return  'Contains a nested schema';
         }
 
         if (!empty($this->ValueDynamic)) {
@@ -198,31 +213,26 @@ class SchemaProperty extends DataObject {
     }
 
     public function getValue($sids = [], $allowNesting = true) {
-    
-        /*
+
+         /*
          * Priority 1
          * (as long as nesting has not been prevented)
          */
         if($allowNesting) {
-            $nestedSchema = $this->getComponent('NestedSchema');
-            if (is_object($nestedSchema) && $nestedSchema->exists()) {
-                /**
-                 * To prevent infinite loops caused by mis-configured nested schemas
-                 * (i.e Person->worksFor->Organization->employee->Person) susequent
-                 * requests to include the same nested SchemaInstance will result
-                 * in the properties dynamic or static value (if set) being returned
-                 * instead. If no dynamic or static value is set for this property
-                 * an empty string is returned, meaning this property is not included
-                 * in the resulting SchemaInstance.
-                 */
-                if (in_array($nestedSchema->ID, $sids)) {
-                    return $this->getValue([], false);
-                } else {
-                    return $nestedSchema->getStructuredData(false, $sids);
+          $nestedSchema = $this->getComponents('NestedSchemas');
+          if(is_object($nestedSchema) && $nestedSchema->exists()){
+                if(count($nestedSchema)>1){
+                  $returnValue=[];
+                  foreach ($nestedSchema as $schema) {
+                    $returnValue[] = $schema->getStructuredData(false,$sids);
+                  }
+                } else{
+                  $returnValue = $nestedSchema[0]->getStructuredData(false,$sids);
                 }
+                return $returnValue;
             }
         }
-        
+
         // Priority 2
         if (!empty($this->ValueDynamic)) {
 
@@ -236,7 +246,7 @@ class SchemaProperty extends DataObject {
                 // Fallback to any static value which might be defined
                 return $this->ValueStatic;
             }
-            
+
             // Split class name and property/method name by separator
             list($className, $fieldName) = explode($separator, $this->ValueDynamic, 2);
             if(preg_match('/\(\)$/', $fieldName)) {
@@ -253,9 +263,9 @@ class SchemaProperty extends DataObject {
                     $fieldName = preg_replace('/[\$]/', '', $fieldName);
                 }
             }
-            
+
             $relatedObj = $this->getRelatedObject();
-            
+
             if($isMethod) {
 
                 if ($separator === "::") {
@@ -277,7 +287,7 @@ class SchemaProperty extends DataObject {
                 }
 
             } else {
-                
+
                 if ($separator === "::") {
                     if (!property_exists($className, $fieldName)) {
                         error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies a property/class combination which does not exist! (Requested Class = "' . $className . '", Requested Property = "' . $fieldName . '"');
@@ -327,7 +337,7 @@ class SchemaProperty extends DataObject {
 
             return $value;
         }
-        
+
         /**
          * Priority 3
          * Might be empty (in which case this property will be excluded)
