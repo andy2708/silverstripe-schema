@@ -1,0 +1,18 @@
+vcs: git
+format: md
+issue_tracker_pattern: https://github.com/Quadra-Digital/silverstripe-schema/issues/\1
+break: "## CHANGELOG"
+output_file_name: "CHANGELOG.md"
+message_groups:
+  Features:
+    - feature
+    - feat
+  Improvements:
+    - improvement
+  Bugfixes:
+    - fix
+    - bugfix
+  Documentation:
+    - docs
+  Refactoring:
+    - refactoring
