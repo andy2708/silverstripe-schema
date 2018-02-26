@@ -1,5 +1,5 @@
 {
-    "name": "quadra-digital/silverstripe-schema",
+    "name": "andy2708/silverstripe-schema",
     "description": "Provides an interface for adding schema.org based structured data.",
     "homepage": "https://github.com/Quadra-Digital/silverstripe-schema",
     "keywords": [
@@ -11,7 +11,7 @@
     ],
     "type": "silverstripe-module",
     "require": {
-        "silverstripe/cms": "^3.2"  
+        "silverstripe/cms": "^3.2"
     },
     "require-dev": {
         "fojuth/readmegen": "~1.1"
