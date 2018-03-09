@@ -54,11 +54,22 @@ class SchemaProperty extends DataObject {
 
         return $defaults;
     }
-
+    private function findAbsoluteParent($object) {
+      if($object->RelatedObjectClass==='SchemaProperty'){
+        $child = $this->get()->byID($object->RelatedObjectID);
+        $superObject= SchemaInstance::get()->byID($child->ParentSchemaID);
+        return $this::findAbsoluteParent($superObject);
+      }
+      else{
+        return $object;
+      }
+    }
+    private function getParentSchema(){
+      $parentSchemaId = parent::data()->ParentSchemaID;
+      return SchemaInstance::get()->byID($parentSchemaId);
+    }
     public function getCMSFields() {
-
         $fields = parent::getCMSFields();
-
         $fields->replaceField(
             'Title',
             DropdownField::create('Title')
@@ -66,7 +77,6 @@ class SchemaProperty extends DataObject {
                 ->setEmptyString('- Please Select -')
                 ->setSource($this->populateProperties())
         );
-
         $nsSource = [];
         $schemas = SchemaInstance::get()
             ->exclude('RelatedObjectID', 0)
@@ -75,18 +85,6 @@ class SchemaProperty extends DataObject {
             $schemaType = $schema->getComponent('Schema')->getTitle();
             $nsSource[$schemaType][$schema->ID] = $schema->getTitle();
         }
-        $fields->replaceField(
-            'NestedSchemaID',
-            GroupedDropdownField::create('NestedSchemaID')
-                ->setTitle('Nested Schema')
-                /**
-                 * Won't work as per {@link https://github.com/silverstripe/silverstripe-framework/issues/4987}, consider submitting a PR to fix.
-                 */
-                ->setEmptyString('[Optional]')
-                // Array addition is a hack to temporarily resolve the above
-                ->setSource(['Disabled' => ['' => '[Optional]']] + $nsSource)
-                ->setDescription('Priority #1 - This properties value can be represented by an existing schema. Link to the existing schema to prevent duplication.')
-        );
 
         $fields->removeByName('NestedSchemas');
         $instanceGridField = GridField::create('NestedSchemas')
@@ -102,7 +100,10 @@ class SchemaProperty extends DataObject {
 
         $dvSource = [];
         $dvSourceCandidates = $this->getDynamicValueOptions();
-        $relObjClass = $this->getComponent('ParentSchema')->RelatedObjectClass;
+        // Traverse up the parent relationship until something that isn't a SchemaProperty as the parent
+        $parentSchema = $this::getParentSchema();
+        $relObjClass = $this::findAbsoluteParent($parentSchema)->RelatedObjectClass;
+        //Check if nested schmea as parent that isnt parent
         foreach ($dvSourceCandidates as $category => $values) {
             foreach ($values as $key => $value) {
 
@@ -116,6 +117,7 @@ class SchemaProperty extends DataObject {
                      * where the source class is not of the same type as the
                      * related DataObject.
                      */
+
                     continue;
                 }
 
@@ -127,7 +129,9 @@ class SchemaProperty extends DataObject {
                  * Prepend the key with class name, as when pulled out of the DB
                  * we will have no context to indicate the category (i.e. class name)
                  */
+
                 $dvSource[$category][$category . $key] = $value;
+
             }
         }
         $fields->replaceField(
@@ -170,12 +174,15 @@ class SchemaProperty extends DataObject {
     }
 
     public function getRelatedObject() {
-
-        if(
-            isset($this->soft_linked_object)
-            && is_object($this->soft_linked_object)
-        ) {
+        if(isset($this->soft_linked_object)&& is_object($this->soft_linked_object)) {
+          if($this->soft_linked_object->RecordClassName !== 'SchemaProperty'){
             return $this->soft_linked_object;
+          }else{
+            $parentSchema = $this->getComponent('ParentSchema');
+            $absParent = $this::findAbsoluteParent($parentSchema);
+            $parentClass = new $absParent->RelatedObjectClass();
+            return $parentClass::get()->byID($absParent->RelatedObjectID);
+          }
         }
 
         $parentSchema = $this->getComponent('ParentSchema');
@@ -195,7 +202,6 @@ class SchemaProperty extends DataObject {
     }
 
     public function getDescription() {
-
         $nestedSchema = $this->getComponents('NestedSchemas')->first();
         if (is_object($nestedSchema) && $nestedSchema->exists()) {
             return  'Contains a nested schema';
@@ -235,7 +241,6 @@ class SchemaProperty extends DataObject {
 
         // Priority 2
         if (!empty($this->ValueDynamic)) {
-
             // Check for valid class name to property/method name separator
             if(strpos($this->ValueDynamic, "::") !== false) {
                 $separator = "::";
@@ -246,7 +251,6 @@ class SchemaProperty extends DataObject {
                 // Fallback to any static value which might be defined
                 return $this->ValueStatic;
             }
-
             // Split class name and property/method name by separator
             list($className, $fieldName) = explode($separator, $this->ValueDynamic, 2);
             if(preg_match('/\(\)$/', $fieldName)) {
@@ -265,9 +269,7 @@ class SchemaProperty extends DataObject {
             }
 
             $relatedObj = $this->getRelatedObject();
-
-            if($isMethod) {
-
+              if($isMethod) {
                 if ($separator === "::") {
                     if (!method_exists($className, $fieldName)) {
                         error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies a method/class combination which does not exist! (Requested Class = "' . $className . '", Requested Method = "' . $fieldName . '"');
@@ -287,7 +289,6 @@ class SchemaProperty extends DataObject {
                 }
 
             } else {
-
                 if ($separator === "::") {
                     if (!property_exists($className, $fieldName)) {
                         error_log('SchemaProperty::getValue() tried to process a dymanic value which specifies a property/class combination which does not exist! (Requested Class = "' . $className . '", Requested Property = "' . $fieldName . '"');
@@ -307,11 +308,9 @@ class SchemaProperty extends DataObject {
                 }
 
             }
-
             if($separator === "::") {
-                $value = (!$isMethod) ? $className::${$fieldName} : $className::{$fieldName}();
+              $value = (!$isMethod) ? $className::${$fieldName} : $className::{$fieldName}();
             } else {
-
                 if(
                     !$relatedObj->exists()
                     || (
