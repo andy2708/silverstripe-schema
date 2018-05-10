@@ -9,7 +9,7 @@
  * @author Joe Harvey <joe.harvey@quadradigital.co.uk>
  */
 class SchemaObjectExtension extends DataExtension {
-    
+
     private static $has_many = [
         'SchemaInstances' => 'SchemaInstance.RelatedObject'
     ];
@@ -29,8 +29,7 @@ class SchemaObjectExtension extends DataExtension {
                     ->removeComponentsByType('GridFieldDeleteAction')
                     ->addComponent(new GridFieldDeleteAction(false))
             );
-        
-        if(!$owner->is_a('SchemaInstance')) {
+        if(!$owner->is_a('SchemaInstance')&& !$owner->is_a('Folder')) {
             $fields->addFieldToTab('Root.SchemaInstances', $schemasGridField);
         }
 
@@ -46,7 +45,7 @@ class SchemaObjectExtension extends DataExtension {
                     ->setAttribute('readonly', 'readonly')
             );
         }
-        
+
         return $fields;
     }
 
@@ -60,7 +59,7 @@ class SchemaObjectExtension extends DataExtension {
      * RelatedObjectID was 0)
      */
     public function getDefaultSchema() {
-        
+
         $classes = ClassInfo::ancestry($this->getOwner()->ClassName);
 
         $candidates = SchemaInstance::get()
@@ -78,17 +77,17 @@ class SchemaObjectExtension extends DataExtension {
         /*
          * If one or more candidates, find the most specific default SchemaInstance
          * based on this objects class and the default schemas related object class
-         * i.e. given SiteTree > Page > HomePage and a default schema set up for 
-         * both Page and HomePage, when we load the homepage, we should get the 
+         * i.e. given SiteTree > Page > HomePage and a default schema set up for
+         * both Page and HomePage, when we load the homepage, we should get the
          * HomePage default schema over the Page default schema.
          */
         foreach(array_reverse($classes) as $class) {
             if($default = $candidates->find('RelatedObjectClass', $class)) {
                 $default->RelatedObjectID = $this->getOwner()->ID;
                 return $default;
-            }   
+            }
         }
-        
+
         // Fallback (this shouldn't be possible)
         return SchemaInstance::create();
     }
